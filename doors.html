@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open the Doors to the World · 대화 퀴즈</title>
+<style>
+  :root{
+    color-scheme:light;
+    --bg:#0e1512; --panel:#16201c; --panel2:#1d2a25;
+    --line:#27362f; --ink:#e9f1ec; --muted:#8ea79b;
+    --green:#2fae7d; --green-d:#1f7a59; --green-soft:#163228;
+    --gold:#d8b24a; --red:#e2604f; --red-soft:#33201d;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif;
+    line-height:1.55;letter-spacing:-.01em;
+  }
+  .wrap{max-width:780px;margin:0 auto;padding:20px 16px 120px}
+  header.top{padding:26px 0 14px;border-bottom:2px solid var(--line);margin-bottom:8px}
+  .kick{color:var(--green);font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+  h1{margin:6px 0 2px;font-size:30px;font-weight:900;letter-spacing:-.03em}
+  .sub{color:var(--muted);font-size:14px;font-weight:600}
+
+  section.page{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .sec-head{margin:30px 0 6px;padding:16px 18px;background:var(--green-soft);
+    border:1.5px solid var(--green-d);border-radius:16px}
+  .sec-head .sec-tag{color:var(--green);font-weight:900;font-size:12px;letter-spacing:.1em}
+  .sec-head h2{margin:4px 0 2px;font-size:22px;font-weight:900;letter-spacing:-.02em}
+  .sec-head h2 em{color:var(--green);font-style:normal;font-size:15px;font-weight:800;margin-left:8px}
+  .sec-head p{margin:0;color:var(--muted);font-size:13px;font-weight:600}
+
+  .card{background:var(--panel);border:1.5px solid var(--line);border-radius:16px;
+    padding:18px 16px;margin:14px 0}
+  .qhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .qno{background:var(--green-d);color:#fff;font-weight:900;font-size:13px;
+    min-width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 6px}
+  .qtitle{font-weight:800;font-size:15px}
+  .hint{color:var(--muted);font-size:13px;font-weight:600;margin-left:auto}
+
+  .pool,.answer{display:flex;flex-wrap:wrap;gap:8px;min-height:10px}
+  .answer{min-height:46px;background:var(--panel2);border:1.5px dashed var(--line);
+    border-radius:12px;padding:10px;margin-bottom:10px;align-content:flex-start}
+  .answer:empty::before{content:"다음 대화를 순서에 맞게 클릭해보세요.";color:var(--muted);font-size:13px;font-weight:600}
+  .chip{background:var(--panel2);border:1.5px solid var(--line);border-radius:10px;
+    padding:9px 12px;font-size:14px;font-weight:600;cursor:pointer;transition:.12s;user-select:none;
+    display:inline-flex;align-items:center;gap:7px;max-width:100%}
+  .chip:hover{border-color:var(--green)}
+  .chip .ord{background:var(--green);color:#04120c;font-weight:900;font-size:11px;
+    min-width:18px;height:18px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center}
+  .chip.sent{display:flex;text-align:left}
+  .word{font-weight:700}
+  .reset{background:none;border:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;
+    text-decoration:underline;margin-top:4px;padding:0}
+
+  .fb-line{font-size:15px;font-weight:600;margin:4px 0 10px;line-height:2.1}
+  .fb-ko{color:var(--muted);font-size:13px;font-weight:600;margin-bottom:8px}
+  .blank{display:inline-block;min-width:140px;background:var(--panel2);border:none;
+    border-bottom:2px solid var(--green-d);color:var(--ink);font-size:15px;font-weight:700;
+    padding:4px 8px;border-radius:6px 6px 0 0;font-family:inherit}
+  .blank:focus{outline:none;border-color:var(--green)}
+
+  .grade-bar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);
+    border-top:1.5px solid var(--line);padding:12px 16px;z-index:30}
+  .grade-bar .inner{max-width:780px;margin:0 auto;display:flex;gap:10px;align-items:center}
+  .btn{border:none;border-radius:12px;font-weight:900;font-size:15px;padding:13px 18px;cursor:pointer;transition:.15s}
+  .btn-primary{background:var(--green);color:#04120c;flex:1}
+  .btn-primary:hover{background:#37c690}
+  .btn-ghost{background:var(--panel2);color:var(--ink);border:1.5px solid var(--line)}
+
+  .overlay{position:fixed;inset:0;background:rgba(4,8,6,.78);display:none;z-index:50;
+    align-items:flex-start;justify-content:center;padding:24px 14px;overflow:auto}
+  .overlay.on{display:flex}
+  .result{background:var(--panel);border:1.5px solid var(--line);border-radius:20px;
+    max-width:560px;width:100%;padding:22px 18px}
+  .score-big{font-size:46px;font-weight:900;letter-spacing:-.03em;margin:2px 0}
+  .score-big span{color:var(--green)}
+  .pct{color:var(--muted);font-weight:700}
+  .bd{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap}
+  .bd .b{flex:1;min-width:90px;background:var(--panel2);border:1.5px solid var(--line);
+    border-radius:12px;padding:10px;text-align:center}
+  .bd .b .n{font-size:20px;font-weight:900}
+  .bd .b .l{font-size:12px;color:var(--muted);font-weight:700}
+  .wrongbox{background:var(--red-soft);border:1.5px solid #5a2e28;border-radius:12px;
+    padding:12px;margin-top:6px;max-height:240px;overflow:auto}
+  .wrongbox h4{margin:0 0 8px;font-size:13px;color:var(--red);font-weight:800}
+  .wrong-item{font-size:13px;font-weight:600;padding:6px 0;border-bottom:1px solid #4a2722}
+  .wrong-item:last-child{border:none}
+  .wrong-item .lbl{color:var(--gold);font-weight:800}
+  .wrong-item .ans{color:#bfe9d4}
+  .allright{color:var(--green);font-weight:800;text-align:center;padding:14px}
+  .res-actions{display:flex;gap:10px;margin-top:16px}
+  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--green);color:#04120c;font-weight:800;padding:11px 20px;border-radius:30px;
+    opacity:0;transition:.25s;z-index:60;font-size:14px}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  .mark{font-weight:900;margin-left:6px}
+  .mark.o{color:var(--green)} .mark.x{color:var(--red)}
+  .graded .chip{cursor:default}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kick">천재(소영순) · 중2 영어</div>
+    <h1>Open the Doors to the World</h1>
+    <div class="sub">4단원 · 대화 퀴즈 · 총 15문항</div>
+  </header>
+
+  <div class="sec-head"><span class="sec-tag">PART 1</span>
+    <h2>순서 배열<em>5문항</em></h2>
+    <p>대화 문장을 순서에 맞게 클릭하세요.</p></div>
+  <section class="page" id="seq"></section>
+
+  <div class="sec-head"><span class="sec-tag">PART 2</span>
+    <h2>빈칸 채우기<em>5문항</em></h2>
+    <p>핵심 표현을 빈칸에 입력하세요.</p></div>
+  <section class="page" id="fill"></section>
+
+  <div class="sec-head"><span class="sec-tag">PART 3</span>
+    <h2>주요 표현 영작<em>5문항</em></h2>
+    <p>단어를 순서대로 클릭해 문장을 완성하세요.</p></div>
+  <section class="page" id="write"></section>
+</div>
+
+<div class="grade-bar">
+  <div class="inner">
+    <button class="btn btn-ghost" onclick="resetAll()">전체 초기화</button>
+    <button class="btn btn-primary" onclick="gradeAll()">전체 채점하기</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="result" id="resultBox"></div>
+</div>
+<div class="toast" id="toast">복사되었습니다</div>
+
+<script>
+/* ---------- DATA ---------- */
+const SEQ = [
+  {"id": 1, "lines": ["Excuse me. How can I get to Times Square?", "Pardon?", "I'm trying to find Times Square. Can you please help me?", "Ah, I got it. Go straight this way and turn left.", "Go straight this way and turn left?", "Right. You can't miss it.", "Thank you so much.", "You're welcome. Have a great time."]},
+  {"id": 2, "lines": ["Excuse me. Why are you standing in line?", "Ah, I'm waiting to buy a pretzel.", "Pret... I beg your pardon?", "I said a pretzel. It is a salty type of bread with a unique shape.", "Oh, I see.", "It's delicious. Give it a try!", "Okay. I'll join the line then. Thank you."]},
+  {"id": 3, "lines": ["Look! There are many musicals.", "Yeah. New York is famous for Broadway musicals.", "How about watching Cats? I heard the performances are amazing.", "That's a great idea.", "Let's check the show times and get tickets.", "Perfect. I can't wait!"]},
+  {"id": 4, "lines": ["Ben, I can't believe we're in New York!", "Yeah. This is my first time here.", "Me, too. There are many places to visit. Where should we start?", "How about the Statue of Liberty?", "Pardon?", "The Statue of Liberty. You know the big green statue of a woman.", "Of course. It's a landmark of New York. Let's visit there first.", "Good. After that, maybe we can go to the Empire State Building. It's famous for the fantastic view.", "That sounds great!"]},
+  {"id": 5, "lines": ["Excuse me, can you take a picture of us, please?", "Sure.", "Thanks a lot! Can we have the tower in the background?", "Pardon?", "We want the N Seoul Tower in the background, please.", "No problem. Ready? 1, 2, 3. Say cheese!"]}
+];
+const FILL = [
+  {"d": 1, "n": 1, "ko": "타임스퀘어에 어떻게 가나요?", "before": "Excuse me.", "answer": "How can I get to", "after": "Times Square?"},
+  {"d": 2, "n": 1, "ko": "아, 프레첼 사려고 기다리고 있어요.", "before": "Ah, I'm", "answer": "waiting to buy", "after": "a pretzel."},
+  {"d": 3, "n": 1, "ko": "뉴욕은 브로드웨이 뮤지컬로 유명하잖아.", "before": "New York", "answer": "is famous for", "after": "Broadway musicals."},
+  {"d": 4, "n": 1, "ko": "가볼 곳이 많네.", "before": "There are", "answer": "many places to visit", "after": ". Where should we start?"},
+  {"d": 5, "n": 1, "ko": "타워가 배경으로 나오게 찍어주실 수 있을까요?", "before": "Can we have the tower", "answer": "in the background", "after": "?"}
+];
+const WRITE = [
+  {"ko": "타임스퀘어에 어떻게 가나요?", "tokens": ["How", "can", "I", "get", "to", "Times", "Square"], "answer": "How can I get to Times Square?"},
+  {"ko": "저는 프레첼 사려고 기다리고 있어요.", "tokens": ["I'm", "waiting", "to", "buy", "a", "pretzel"], "answer": "I'm waiting to buy a pretzel."},
+  {"ko": "뉴욕은 브로드웨이 뮤지컬로 유명하잖아.", "tokens": ["New", "York", "is", "famous", "for", "Broadway", "musicals"], "answer": "New York is famous for Broadway musicals."},
+  {"ko": "가볼 곳이 많이 있어.", "tokens": ["There", "are", "many", "places", "to", "visit"], "answer": "There are many places to visit."},
+  {"ko": "타워가 배경으로 나오게 찍어주실 수 있을까요?", "tokens": ["Can", "we", "have", "the", "tower", "in", "the", "background"], "answer": "Can we have the tower in the background?"}
+];
+
+/* ---------- HELPERS ---------- */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function norm(s){return (s||"").toLowerCase().replace(/[’‘']/g,"'").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();}
+
+const seqState = SEQ.map(q=>({pool:shuffle(q.lines.map((t,i)=>({t,i}))), picked:[]}));
+const writeState = WRITE.map(q=>({pool:shuffle(q.tokens.map((t,i)=>({t,i}))), picked:[]}));
+let graded=false;
+
+/* ---------- RENDER: SEQUENCE ---------- */
+function renderSeq(){
+  const root=document.getElementById("seq");root.innerHTML="";
+  SEQ.forEach((q,qi)=>{
+    const card=document.createElement("div");card.className="card";card.id="seqcard"+qi;
+    card.innerHTML='<div class="qhead"><div class="qno">'+q.id+'</div>'+
+      '<div class="qtitle">대화 '+q.id+'</div>'+
+      '<div class="hint">순서대로 클릭</div></div>';
+    const ans=document.createElement("div");ans.className="answer";
+    const pool=document.createElement("div");pool.className="pool";
+    card.appendChild(ans);card.appendChild(pool);
+    const rs=document.createElement("button");rs.className="reset";rs.textContent="↺ 이 문제 다시";
+    rs.onclick=function(){if(graded)return;seqState[qi].picked=[];seqState[qi].pool=shuffle(q.lines.map((t,i)=>({t,i})));drawSeqCard(qi);};
+    card.appendChild(rs);
+    root.appendChild(card);
+    drawSeqCard(qi);
+  });
+}
+function drawSeqCard(qi){
+  const q=SEQ[qi],st=seqState[qi];
+  const card=document.getElementById("seqcard"+qi);
+  const ans=card.querySelector(".answer"),pool=card.querySelector(".pool");
+  ans.innerHTML="";pool.innerHTML="";
+  st.picked.forEach((it,pos)=>{
+    const c=document.createElement("div");c.className="chip sent";
+    let mark="";
+    if(graded){const correct=q.lines[pos]===it.t;mark='<span class="mark '+(correct?'o':'x')+'">'+(correct?'✓':'✗')+'</span>';}
+    c.innerHTML='<span class="ord">'+(pos+1)+'</span><span>'+it.t+'</span>'+mark;
+    if(!graded)c.onclick=function(){st.pool.push(it);st.picked.splice(pos,1);drawSeqCard(qi);};
+    ans.appendChild(c);
+  });
+  st.pool.forEach((it)=>{
+    const c=document.createElement("div");c.className="chip sent";
+    c.innerHTML='<span>'+it.t+'</span>';
+    if(!graded)c.onclick=function(){st.picked.push(it);st.pool=st.pool.filter(x=>x!==it);drawSeqCard(qi);};
+    pool.appendChild(c);
+  });
+}
+
+/* ---------- RENDER: FILL ---------- */
+function renderFill(){
+  const root=document.getElementById("fill");root.innerHTML="";
+  let curD=0;
+  FILL.forEach((q,qi)=>{
+    if(q.d!==curD){curD=q.d;const h=document.createElement("div");
+      h.style.cssText="font-weight:900;font-size:16px;color:var(--green);margin:18px 4px 2px";
+      h.textContent="대화문 "+q.d;root.appendChild(h);}
+    const card=document.createElement("div");card.className="card";
+    card.innerHTML='<div class="qhead"><div class="qno">'+q.d+'-'+q.n+'</div>'+
+      '<div class="qtitle">빈칸 채우기</div></div>'+
+      '<div class="fb-ko">'+q.ko+'</div>'+
+      '<div class="fb-line">'+q.before+' <input class="blank" id="fb'+qi+'" autocomplete="off" spellcheck="false"> '+q.after+
+      ' <span id="fbm'+qi+'"></span></div>';
+    root.appendChild(card);
+  });
+}
+
+/* ---------- RENDER: WRITE ---------- */
+function renderWrite(){
+  const root=document.getElementById("write");root.innerHTML="";
+  WRITE.forEach((q,qi)=>{
+    const card=document.createElement("div");card.className="card";card.id="wcard"+qi;
+    card.innerHTML='<div class="qhead"><div class="qno">'+(qi+1)+'</div>'+
+      '<div class="qtitle">단어 배열 영작</div>'+
+      '<div class="hint">단어를 순서대로 클릭</div></div>'+
+      '<div class="fb-ko">'+q.ko+'</div>';
+    const ans=document.createElement("div");ans.className="answer";
+    const pool=document.createElement("div");pool.className="pool";
+    card.appendChild(ans);card.appendChild(pool);
+    const rs=document.createElement("button");rs.className="reset";rs.textContent="↺ 이 문제 다시";
+    rs.onclick=function(){if(graded)return;writeState[qi].picked=[];writeState[qi].pool=shuffle(q.tokens.map((t,i)=>({t,i})));drawWriteCard(qi);};
+    card.appendChild(rs);
+    root.appendChild(card);
+    drawWriteCard(qi);
+  });
+}
+function drawWriteCard(qi){
+  const q=WRITE[qi],st=writeState[qi];
+  const card=document.getElementById("wcard"+qi);
+  const ans=card.querySelector(".answer"),pool=card.querySelector(".pool");
+  ans.innerHTML="";pool.innerHTML="";
+  st.picked.forEach((it,pos)=>{
+    const c=document.createElement("div");c.className="chip";
+    let mark="";
+    if(graded){const correct=q.tokens[pos]===it.t;mark='<span class="mark '+(correct?'o':'x')+'">'+(correct?'✓':'✗')+'</span>';}
+    c.innerHTML='<span class="ord">'+(pos+1)+'</span><span class="word">'+it.t+'</span>'+mark;
+    if(!graded)c.onclick=function(){st.pool.push(it);st.picked.splice(pos,1);drawWriteCard(qi);};
+    ans.appendChild(c);
+  });
+  st.pool.forEach((it)=>{
+    const c=document.createElement("div");c.className="chip";
+    c.innerHTML='<span class="word">'+it.t+'</span>';
+    if(!graded)c.onclick=function(){st.picked.push(it);st.pool=st.pool.filter(x=>x!==it);drawWriteCard(qi);};
+    pool.appendChild(c);
+  });
+}
+
+/* ---------- GRADE ---------- */
+function gradeAll(){
+  graded=true;
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("graded"));
+  const wrong={seq:[],fill:[],write:[]};
+  let seqCorrect=0;
+  SEQ.forEach((q,qi)=>{
+    const picked=seqState[qi].picked.map(x=>x.t);
+    const ok = picked.length===q.lines.length && q.lines.every((l,i)=>l===picked[i]);
+    if(ok)seqCorrect++;else wrong.seq.push("대화 "+q.id);
+    drawSeqCard(qi);
+  });
+  let fillCorrect=0;
+  FILL.forEach((q,qi)=>{
+    const inp=document.getElementById("fb"+qi);
+    const ok=norm(inp.value)===norm(q.answer);
+    const m=document.getElementById("fbm"+qi);
+    if(ok){fillCorrect++;m.innerHTML='<span class="mark o">✓</span>';inp.style.borderColor="var(--green)";}
+    else{m.innerHTML='<span class="mark x">✗</span> <span style="color:#bfe9d4;font-weight:700;font-size:13px">'+q.answer+'</span>';
+      inp.style.borderColor="var(--red)";
+      wrong.fill.push("대화문 "+q.d+"-"+q.n+" → "+q.answer);}
+    inp.disabled=true;
+  });
+  let writeCorrect=0;
+  WRITE.forEach((q,qi)=>{
+    const picked=writeState[qi].picked.map(x=>x.t);
+    const ok = picked.length===q.tokens.length && q.tokens.every((t,i)=>t===picked[i]);
+    if(ok)writeCorrect++;else wrong.write.push((qi+1)+"번 → "+q.answer);
+    drawWriteCard(qi);
+  });
+  showResult(seqCorrect,fillCorrect,writeCorrect,wrong);
+}
+
+function showResult(s,f,w,wrong){
+  const tot=s+f+w, max=SEQ.length+FILL.length+WRITE.length;
+  const pct=Math.round(tot/max*100);
+  let wrongHtml="";
+  const groups=[["순서 배열",wrong.seq],["빈칸 채우기",wrong.fill],["주요 표현 영작",wrong.write]];
+  const anyWrong=wrong.seq.length+wrong.fill.length+wrong.write.length>0;
+  if(anyWrong){
+    wrongHtml='<div class="wrongbox"><h4>틀린 문제 '+(max-tot)+'개</h4>';
+    groups.forEach(g=>{g[1].forEach(it=>{
+      wrongHtml+='<div class="wrong-item"><span class="lbl">['+g[0]+']</span> <span class="ans">'+it+'</span></div>';
+    });});
+    wrongHtml+='</div>';
+  }else{
+    wrongHtml='<div class="allright">🎉 전부 정답입니다! 완벽해요.</div>';
+  }
+  document.getElementById("resultBox").innerHTML=
+    '<div class="kick" style="color:var(--green)">채점 결과</div>'+
+    '<div class="score-big"><span>'+tot+'</span> / '+max+'</div>'+
+    '<div class="pct">정답률 '+pct+'%</div>'+
+    '<div class="bd">'+
+      '<div class="b"><div class="n">'+s+'/'+SEQ.length+'</div><div class="l">순서 배열</div></div>'+
+      '<div class="b"><div class="n">'+f+'/'+FILL.length+'</div><div class="l">빈칸 채우기</div></div>'+
+      '<div class="b"><div class="n">'+w+'/'+WRITE.length+'</div><div class="l">영작</div></div>'+
+    '</div>'+
+    wrongHtml+
+    '<div class="res-actions">'+
+      '<button class="btn btn-primary" onclick="copyResult()">📋 카톡용 결과 복사</button>'+
+      '<button class="btn btn-ghost" onclick="closeResult()">닫기</button>'+
+    '</div>'+
+    '<div style="text-align:center;color:var(--muted);font-size:12px;font-weight:600;margin-top:10px">복사한 결과를 선생님께 카카오톡으로 붙여넣어 보내 주세요.</div>';
+  let txt="[중2 Open the Doors to the World 대화 퀴즈 결과]\n점수: "+tot+"/"+max+" ("+pct+"%)\n";
+  txt+="- 순서배열: "+s+"/"+SEQ.length+"\n- 빈칸채우기: "+f+"/"+FILL.length+"\n- 영작: "+w+"/"+WRITE.length+"\n";
+  if(anyWrong){
+    txt+="\n[틀린 문제]\n";
+    groups.forEach(g=>{g[1].forEach(it=>{txt+="· "+g[0]+": "+it+"\n";});});
+  }else{txt+="\n전부 정답! 🎉\n";}
+  const now=new Date();
+  txt+="\n"+now.getFullYear()+"."+(now.getMonth()+1)+"."+now.getDate()+" "+
+    String(now.getHours()).padStart(2,'0')+":"+String(now.getMinutes()).padStart(2,'0');
+  window.__copyText=txt;
+  document.getElementById("overlay").classList.add("on");
+}
+function copyResult(){
+  const t=window.__copyText||"";
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(showToast).catch(fallbackCopy);
+  }else{fallbackCopy();}
+  function fallbackCopy(){
+    const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");showToast();}catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+function showToast(){const t=document.getElementById("toast");t.classList.add("on");setTimeout(function(){t.classList.remove("on");},1600);}
+function closeResult(){document.getElementById("overlay").classList.remove("on");}
+function resetAll(){if(confirm("모든 답을 지우고 처음부터 다시 풀까요?"))location.reload();}
+
+renderSeq();renderFill();renderWrite();
+</script>
+</body>
+</html>
